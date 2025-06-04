@@ -10,7 +10,7 @@ export function Shop() {
   const [goods, setGoods] = useState([]);
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState([]);
-  const [isBasketShow, setBasketShow] = useState(false);
+  const [isBasketShow, setIsBasketShow] = useState(false);
   const [isTooltipVisible, setTooltipVisible] = useState(false);
 
   useEffect(() => {
@@ -25,15 +25,6 @@ export function Shop() {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if(isTooltipVisible){
-      const timer = setTimeout(() => {
-        setTooltipVisible(false)
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [isTooltipVisible]);
-
   const addToBasket = (item) => {
     setOrder((prevOrder) => {
       const itemIndex = prevOrder.findIndex(
@@ -41,7 +32,7 @@ export function Shop() {
       );
 
       if (itemIndex < 0) {
-        return [...orderItem, { ...item, quantity: 1 }];
+        return [...prevOrder, { ...item, quantity: 1 }];
       }
   
       return prevOrder.map((orderItem, index) => 
@@ -51,6 +42,16 @@ export function Shop() {
     );
   });
 };
+
+  useEffect(() => {
+    if(isTooltipVisible){
+      const timer = setTimeout(() => {
+        setTooltipVisible(false)
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isTooltipVisible]);
+
 
   const removeFromBasket = (mainId) => {
     setOrder((prevOrder) => prevOrder.filter((item) => item.mainId !== mainId));
@@ -85,17 +86,44 @@ export function Shop() {
 
   const closeModal = (e) => {
     if (e.target.classList.contains("modal-overlay")) {
-      setBasketShow(false);
+      setIsBasketShow(false);
     }
   };
 
   return (
     <main className="container content">
-      <div className="cart-container">
-        <div className="cart" onClick={handleBasketShow}>
-          <i className="mater">shop</i>
+    {loading ?
+        (<p>meow</p>) : (
+          <div>
+          <div className="cart-container">
+            <div className="cart" onClick={handleBasketShow}>
+              <i className="material-icons">shopping_basket</i>
+              {order.length > 0 && (
+                <span className="cart-quantity">{order.length}</span>
+              )}
+            </div>
+          </div>
+          
+          {isBasketShow && (
+            <div className="modal-overlay" onClick={closeModal}>
+              <div className="modal-content">
+                <button
+                  className="modal-close"
+                  onClick={setIsBasketShow(false)}
+                >
+                  &times
+                </button>
+                <BasketList
+                  order={order}
+                  removeFromBasket={removeFromBasket}
+                  incrementQuantity={incrementQuantity}
+                  decrementQuantity={decrementQuantity}
+                />
+              </div>
+            </div>
+          )}
         </div>
-      </div>
+      )}
     </main>
-  );
+  )
 }
