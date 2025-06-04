@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router";
-import { Header, Footer, Shop } from "./components/layout";
+import { Header, Footer, Shop, ProductPage } from "./components/layout";
 
 export default function App() {
   return (
